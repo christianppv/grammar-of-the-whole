@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Grammar of the Whole</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --ink:        #1c1a17;
+      --ink-soft:   #4a4540;
+      --ink-faint:  #8a8078;
+      --paper:      #f5f0e8;
+      --paper-warm: #ede7d9;
+      --paper-dark: #e0d8ca;
+      --accent:     #8b3a2a;
+      --accent-soft:#c4694f;
+      --rule:       rgba(28,26,23,0.15);
+      --rule-light: rgba(28,26,23,0.07);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--paper);
+      color: var(--ink);
+      font-family: 'Crimson Pro', Georgia, serif;
+      font-weight: 300;
+      line-height: 1.7;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.6;
+    }
+
+    /* ─── MASTHEAD ─── */
+    .masthead {
+      border-bottom: 1px solid var(--rule);
+      padding: 2rem 0 0;
+      overflow: hidden;
+    }
+
+    .masthead-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 2.5rem;
+    }
+
+    .series-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 2rem;
+    }
+
+    .masthead-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .masthead-title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .masthead-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      color: var(--ink-soft);
+      max-width: 580px;
+      line-height: 1.55;
+      margin-top: 1.2rem;
+      padding-bottom: 2.5rem;
+    }
+
+    .masthead-rule {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--rule) 40%, transparent 100%);
+    }
+
+    /* ─── INTRO ─── */
+    .intro {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 2.5rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      border-bottom: 1px solid var(--rule-light);
+    }
+
+    @media (max-width: 640px) {
+      .intro { grid-template-columns: 1fr; gap: 1.5rem; }
+    }
+
+    .intro-text {
+      font-size: 1.05rem;
+      color: var(--ink-soft);
+      line-height: 1.75;
+    }
+
+    .intro-text p + p { margin-top: 1em; }
+
+    .intro-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      padding-top: 0.25rem;
+    }
+
+    .meta-block {
+      border-left: 2px solid var(--accent);
+      padding-left: 1rem;
+    }
+
+    .meta-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 0.35rem;
+    }
+
+    .meta-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 0.95rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    /* ─── ESSAY LIST ─── */
+    .essay-section {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 3rem 2.5rem 5rem;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .section-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+    }
+
+    .section-count {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.9rem;
+      color: var(--ink-faint);
+      margin-left: auto;
+    }
+
+    .essay-list { list-style: none; }
+
+    .essay-item {
+      border-bottom: 1px solid var(--rule-light);
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fadeUp 0.5s ease forwards;
+    }
+
+    .essay-item:nth-child(1)  { animation-delay: 0.04s; }
+    .essay-item:nth-child(2)  { animation-delay: 0.09s; }
+    .essay-item:nth-child(3)  { animation-delay: 0.14s; }
+    .essay-item:nth-child(4)  { animation-delay: 0.19s; }
+    .essay-item:nth-child(5)  { animation-delay: 0.24s; }
+    .essay-item:nth-child(6)  { animation-delay: 0.29s; }
+    .essay-item:nth-child(7)  { animation-delay: 0.34s; }
+    .essay-item:nth-child(8)  { animation-delay: 0.39s; }
+    .essay-item:nth-child(9)  { animation-delay: 0.44s; }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .essay-link {
+      display: grid;
+      grid-template-columns: 3.5rem 1fr auto;
+      align-items: start;
+      gap: 1.5rem;
+      padding: 1.75rem 0;
+      text-decoration: none;
+      color: inherit;
+      position: relative;
+    }
+
+    .essay-link:hover .essay-title  { color: var(--accent); }
+    .essay-link:hover .essay-number { color: var(--accent); }
+
+    .essay-link::before {
+      content: '';
+      position: absolute;
+      left: -2.5rem;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: var(--accent);
+      transform: scaleY(0);
+      transform-origin: top;
+      transition: transform 0.25s ease;
+    }
+
+    .essay-link:hover::before { transform: scaleY(1); }
+
+    .essay-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 2rem;
+      font-weight: 300;
+      color: var(--paper-dark);
+      line-height: 1;
+      padding-top: 0.15rem;
+      transition: color 0.2s;
+      user-select: none;
+    }
+
+    .essay-body { flex: 1; }
+
+    .essay-rubric {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 0.45rem;
+    }
+
+    .essay-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      line-height: 1.25;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+      transition: color 0.2s;
+    }
+
+    .essay-question {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 300;
+      font-size: 1rem;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+
+    .essay-status {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.4rem;
+      padding-top: 0.2rem;
+      min-width: 90px;
+    }
+
+    .status-badge {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.55rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 2px;
+    }
+
+    .status-badge.published   { background: var(--accent); color: var(--paper); }
+    .status-badge.forthcoming { background: transparent; color: var(--ink-faint); border: 1px solid var(--rule); }
+    .status-badge.wip         { background: var(--paper-dark); color: var(--ink-soft); border: 1px solid var(--rule); }
+
+    .ornament {
+      text-align: center;
+      padding: 1.5rem 0;
+      color: var(--ink-faint);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      letter-spacing: 0.5em;
+      opacity: 0.4;
+    }
+
+    /* ─── WRITING NOTES PANEL ─── */
+    .notes-section {
+      background: var(--paper-warm);
+      border-top: 1px solid var(--rule-light);
+      border-bottom: 1px solid var(--rule-light);
+    }
+
+    .notes-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2.5rem 2.5rem;
+    }
+
+    .notes-header {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      margin-bottom: 1.25rem;
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+    }
+
+    @media (max-width: 640px) {
+      .notes-grid { grid-template-columns: 1fr; gap: 1.25rem; }
+    }
+
+    .note-item {
+      border-left: 1px solid var(--rule);
+      padding-left: 1rem;
+    }
+
+    .note-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .note-body {
+      font-size: 0.88rem;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--rule);
+      background: var(--paper-warm);
+    }
+
+    .footer-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-sig {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: var(--ink-faint);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--ink-faint);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--accent); }
+
+    @media (max-width: 500px) {
+      .essay-link { grid-template-columns: 2.5rem 1fr; }
+      .essay-status { display: none; }
+      .masthead-inner, .intro, .essay-section,
+      .notes-inner { padding-left: 1.5rem; padding-right: 1.5rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="masthead">
+    <div class="masthead-inner">
+      <p class="series-label">Essay Series &middot; Nine Parts</p>
+      <h1 class="masthead-title">A Grammar<br /><em>of the Whole</em></h1>
+      <p class="masthead-subtitle">
+        An inquiry into reality as a nested structure —
+        from the question of what holds everything together
+        to the question of what that means for a single life.
+      </p>
+    </div>
+    <div class="masthead-rule"></div>
+  </header>
+
+  <section class="intro" aria-label="Introduction">
+    <div class="intro-text">
+      <p>
+        What holds reality together? This series develops an answer
+        in nine steps — from the basic structure of being
+        to the consequences for how we live, know, and create.
+      </p>
+      <p>
+        Each essay stands alone and carries a thread forward from the one before.
+        The essays work at the boundary between metaphysics
+        and cognitive science, drawing on both without belonging entirely to either.
+      </p>
+    </div>
+    <div class="intro-meta">
+      <div class="meta-block">
+        <div class="meta-label">Author</div>
+        <div class="meta-value">Christian Popov — Cognitive Science, TU Darmstadt</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">Philosophical lineage</div>
+        <div class="meta-value">Whitehead · Spinoza · Plotinus · Hoffman · Barbour · Bohm</div>
+      </div>
+      <div class="meta-block">
+        <div class="meta-label">Status</div>
+        <div class="meta-value">Two essays published — seven in progress</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="essay-section" aria-label="Essay list">
+    <div class="section-header">
+      <span class="section-title">The Essays</span>
+      <span class="section-count">I &mdash; IX</span>
+    </div>
+
+    <ul class="essay-list">
+
+      <!-- ESSAY I — Ontology -->
+      <li class="essay-item">
+        <a href="essay-01.html" class="essay-link">
+          <span class="essay-number" aria-hidden="true">I</span>
+          <div class="essay-body">
+            <div class="essay-rubric">Ontology</div>
+            <div class="essay-title">The Foundation</div>
+            <div class="essay-question">Is reality a recursive self-portrait of the Absolute — and the human being a zoom-in of it?</div>
+          </div>
+          <div class="essay-status"><span class="status-badge published">Published</span></div>
+        </a>
+      </li>
+
+      <!-- ESSAY II — Time -->
+      <li class="essay-item">
+        <a href="essay-02.html" class="essay-link">
+          <span class="essay-number" aria-hidden="true">II</span>
+          <div class="essay-body">
+            <div class="essay-rubric">Time</div>
+            <div class="essay-title">The Echo of Touch</div>
+            <div class="essay-question">Is time the echo of contact — and does it exist only where systems enter into resonance with one another?</div>
+          </div>
+          <div class="essay-status"><span class="status-badge published">Published</span></div>
+        </a>
+      </li>
+
+      <!-- ESSAY III — Field Communication -->
+      <li class="essay-item">
+        <a href="essay-03.html" class="essay-link">
+          <span class="essay-number" aria-hidden="true">III</span>
+          <div class="essay-body">
+            <div class="essay-rubric">Field Communication</div>
+            <div class="essay-title">The Geometry of the Living</div>
+            <div class="essay-question">What is the medium through which the chain speaks to itself — and what shape does it take?</div>
+          </div>
+          <div class="essay-status"><span class="status-badge wip">In Progress</span></div>
+        </a>
+      </li>
+
+      <!-- ESSAY IV — Epistemology -->
+      <li class="essay-item">
+        <a href="#" class="essay-link">
+          <span class="essay-number" aria-hidden="true">IV</span>
+          <div class="essay-body">
+            <div class="essay-rubric">Epistemology</div>
+            <div class="essay-title">How Knowledge Works</div>
+            <div class="essay-question">Do we recognise the world — or do we remember it?</div>
+          </div>
+          <div class="essay-status"><span class="status-badge forthcoming">Forthcoming</span></div>
+        </a>
+      </li>
+
+      <!-- ESSAY V — Language & Metaphor -->
+      <li class="essay-item">
+        <a href="#" class="essay-link">
+          <span class="essay-number" aria-hidden="true">V</span>
+          <div class="essay-body">
+            <div class="essay-rubric">Language &amp; Metaphor</div>
+            <div class="essay-title">The Translation Machine</div>
+            <div class="essay-question">Is metaphor the basic mode of thought — or of reality itself?</div>
+          </div>
+          <div class="essay-status"><span class="status-badge forthcoming">Forthcoming</span></div>
+        </a>
+      </li>
+
+      <!-- ESSAY VI — Aesthetics -->
+      <li class="essay-item">
+        <a href="#" class="essay-link">
+          <span class="essay-number" aria-hidden="true">VI</span>
+          <div class="essay-body">
+            <div class="essay-rubric">Aesthetics</div>
+            <div class="essay-title">The Permeable Moment</div>
+            <div class="essay-question">Is creativity the intrusion of the real into our simulation?</div>
+          </div>
+          <div class="essay-status"><span class="status-badge forthcoming">Forthcoming</span></div>
+        </a>
+      </li>
+
+      <!-- ESSAY VII — Individuation -->
+      <li class="essay-item">
+        <a href="#" class="essay-link">
+          <span class="essay-number" aria-hidden="true">VII</span>
+          <div class="essay-body">
+            <div class="essay-rubric">Individuation</div>
+            <div class="essay-title">The Individual Code</div>
+            <div class="essay-question">What am I within the whole — and why am I not interchangeable?</div>
+          </div>
+          <div class="essay-status"><span class="status-badge forthcoming">Forthcoming</span></div>
+        </a>
+      </li>
+
+      <!-- ESSAY VIII — Pathology -->
+      <li class="essay-item">
+        <a href="#" class="essay-link">
+          <span class="essay-number" aria-hidden="true">VIII</span>
+          <div class="essay-body">
+            <div class="essay-rubric">Pathology</div>
+            <div class="essay-title">Self-Undermining</div>
+            <div class="essay-question">When does a part become the enemy of the whole — and why does it destroy itself in doing so?</div>
+          </div>
+          <div class="essay-status"><span class="status-badge forthcoming">Forthcoming</span></div>
+        </a>
+      </li>
+
+      <!-- ESSAY IX — Synthesis -->
+      <li class="essay-item">
+        <a href="#" class="essay-link">
+          <span class="essay-number" aria-hidden="true">IX</span>
+          <div class="essay-body">
+            <div class="essay-rubric">Synthesis</div>
+            <div class="essay-title">The Whole</div>
+            <div class="essay-question">A Grammar of the Whole — what follows for how one lives?</div>
+          </div>
+          <div class="essay-status"><span class="status-badge forthcoming">Forthcoming</span></div>
+        </a>
+      </li>
+
+    </ul>
+
+    <div class="ornament" aria-hidden="true">· · ·</div>
+  </main>
+
+  <aside class="notes-section" aria-label="On the essays">
+    <div class="notes-inner">
+      <p class="notes-header">On the form of these essays</p>
+      <div class="notes-grid">
+        <div class="note-item">
+          <div class="note-title">Ladder of abstraction</div>
+          <div class="note-body">Each essay moves between the concrete and the universal — a specific observation opens, a structural argument follows, a question closes. Neither rung alone is enough.</div>
+        </div>
+        <div class="note-item">
+          <div class="note-title">Perennial, not topical</div>
+          <div class="note-body">These essays are written to be read at any time, from anywhere. They do not comment on current events. They try to reach something prior to the news cycle.</div>
+        </div>
+        <div class="note-item">
+          <div class="note-title">Open tensions</div>
+          <div class="note-body">Three structural tensions run through the whole series — teleology without foundation, metaphysics or anthropology, time and causality. Each essay lives with them rather than resolving them prematurely.</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-sig">A Grammar of the Whole — an essay series</span>
+      <ul class="footer-links">
+        <li><a href="essay-01.html">Read Essay I</a></li>
+        <li><a href="essay-02.html">Read Essay II</a></li>
+        <li><a href="mailto:">Contact</a></li>
+      </ul>
+    </div>
+  </footer>
+
+</body>
+</html>
